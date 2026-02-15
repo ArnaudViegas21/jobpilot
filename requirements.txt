@@ -1,0 +1,8 @@
+playwright 
+beautifulsoup4 
+httpx 
+pandas 
+pydantic 
+rich 
+typer 
+pyyaml 
