@@ -26,11 +26,11 @@ class BaseScraper(ABC):
         """Add random delay to avoid rate limiting."""
         time.sleep(random.uniform(min_seconds, max_seconds))
     
-    def safe_get(self, url: str, max_retries: int = 3) -> requests.Response:
+    def safe_get(self, url: str, params: dict = None, max_retries: int = 3) -> requests.Response:
         """Make a request with retry logic."""
         for attempt in range(max_retries):
             try:
-                response = self.session.get(url, timeout=10)
+                response = self.session.get(url, params=params, timeout=10)
                 response.raise_for_status()
                 return response
             except requests.RequestException as e:

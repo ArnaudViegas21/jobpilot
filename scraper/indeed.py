@@ -15,6 +15,9 @@ class IndeedScraper(BaseScraper):
         """
         Search Indeed for jobs.
         
+        NOTE: Indeed actively blocks scrapers. This may not work reliably.
+        Consider using the Adzuna API scraper instead (scraper/adzuna.py).
+        
         Args:
             keywords: Job search keywords (e.g., "Python Developer")
             location: Location filter (e.g., "New York, NY")
@@ -24,6 +27,19 @@ class IndeedScraper(BaseScraper):
             List of Job objects
         """
         jobs = []
+        
+        # Add more realistic headers to avoid detection
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': 'https://www.indeed.com/',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+        })
+        
         search_url = f"{self.BASE_URL}/jobs"
         params = {
             'q': keywords,
@@ -32,8 +48,10 @@ class IndeedScraper(BaseScraper):
         }
         
         print(f"[indeed] Searching for '{keywords}' in '{location}'...")
+        print(f"[indeed] WARNING: Indeed blocks scrapers. If this fails, use Adzuna API instead.")
         
         try:
+            self.random_delay(1, 3)  # Add delay before request
             response = self.safe_get(search_url, params=params)
             soup = BeautifulSoup(response.content, 'html.parser')
             

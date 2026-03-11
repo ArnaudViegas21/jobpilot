@@ -25,7 +25,8 @@ venv/
 ENV/
 env/
 
-# Personal data
+# Personal data - NEVER COMMIT THESE
+config.yaml
 data/applications.csv
 data/resume.json
 data/resume.pdf
@@ -65,6 +66,6 @@ logs/
 *.db
 *.sqlite
 
-# Config with secrets (if you add API keys)
+# Config with secrets
 config.local.yaml
 secrets.yaml

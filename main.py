@@ -11,10 +11,12 @@ from rich.console import Console
 from rich.table import Table
 from rich.progress import track
 import json
+import yaml
 from pathlib import Path
 
 from scraper.indeed import IndeedScraper
 from scraper.linkedin import LinkedInScraper
+from scraper.adzuna import AdzunaScraper
 from applier.applier import JobApplier
 from tracker.tracker import (
     save_application, 
@@ -33,7 +35,7 @@ console = Console()
 def scrape(
     keywords: str = typer.Option(..., "--keywords", "-k", help="Job search keywords"),
     location: str = typer.Option("", "--location", "-l", help="Location filter"),
-    source: str = typer.Option("indeed", "--source", "-s", help="Job board (indeed/linkedin)"),
+    source: str = typer.Option("adzuna", "--source", "-s", help="Job board (adzuna/indeed/linkedin)"),
     limit: int = typer.Option(10, "--limit", "-n", help="Max number of jobs to scrape"),
     save: bool = typer.Option(True, "--save/--no-save", help="Save results to jobs.json")
 ):
@@ -41,7 +43,27 @@ def scrape(
     console.print(f"\n[bold blue]Scraping {source.upper()}...[/bold blue]")
     
     # Initialize scraper
-    if source.lower() == "indeed":
+    if source.lower() == "adzuna":
+        # Load API credentials from config
+        config_file = Path("config.yaml")
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config = yaml.safe_load(f) or {}
+        else:
+            config = {}
+        
+        api_keys = config.get('api_keys', {}).get('adzuna', {})
+        app_id = api_keys.get('app_id')
+        app_key = api_keys.get('app_key')
+        
+        if not app_id or not app_key or app_id == "YOUR_ADZUNA_APP_ID":
+            console.print("[red]Adzuna API credentials not found![/red]")
+            console.print("[yellow]Get free API key at: https://developer.adzuna.com/[/yellow]")
+            console.print("[yellow]Add to config.yaml under 'api_keys.adzuna'[/yellow]")
+            return
+        
+        scraper = AdzunaScraper(app_id, app_key)
+    elif source.lower() == "indeed":
         scraper = IndeedScraper()
     elif source.lower() == "linkedin":
         scraper = LinkedInScraper()
@@ -227,12 +249,20 @@ def config():
     """Open config.yaml for editing."""
     import subprocess
     import sys
+    import os
     
     config_file = Path("config.yaml")
     
     if not config_file.exists():
         # Create default config
         default_config = """# JobPilot Configuration
+
+# API Keys for job boards (get free keys at these URLs)
+api_keys:
+  adzuna:
+    # Get free API key at: https://developer.adzuna.com/
+    app_id: "YOUR_ADZUNA_APP_ID"
+    app_key: "YOUR_ADZUNA_APP_KEY"
 
 # Your personal information (used for auto-filling forms)
 personal_info:
