@@ -329,5 +329,58 @@ def stats():
         console.print(f"Offer Rate: [green]{offer_rate:.1f}%[/green]")
 
 
+@app.command()
+def export(
+    summary_report: bool = typer.Option(False, "--summary", "-s", help="Export detailed summary report"),
+    output: str = typer.Option(None, "--output", "-o", help="Output file path")
+):
+    """Export applications to Excel."""
+    from tracker.excel_export import export_to_excel, export_summary_to_excel
+    
+    try:
+        if summary_report:
+            filepath = export_summary_to_excel(output)
+            console.print(f"[green]✓ Exported summary report to {filepath}[/green]")
+        else:
+            filepath = export_to_excel(output)
+            console.print(f"[green]✓ Exported applications to {filepath}[/green]")
+        
+        # Open the file
+        import subprocess
+        import sys
+        if sys.platform == "win32":
+            subprocess.run(["start", filepath], shell=True)
+        elif sys.platform == "darwin":
+            subprocess.run(["open", filepath])
+        else:
+            subprocess.run(["xdg-open", filepath])
+    except ValueError as e:
+        console.print(f"[red]{e}[/red]")
+    except Exception as e:
+        console.print(f"[red]Error exporting: {e}[/red]")
+
+
+@app.command()
+def dashboard():
+    """Launch the web dashboard."""
+    console.print("\n[bold blue]🚀 Starting JobPilot Dashboard...[/bold blue]")
+    console.print("[green]📊 Access at: http://localhost:5000[/green]")
+    console.print("[yellow]Press Ctrl+C to stop[/yellow]\n")
+    
+    import subprocess
+    import sys
+    
+    # Run the dashboard
+    dashboard_path = Path("apps/dashboard.py")
+    if not dashboard_path.exists():
+        console.print("[red]Dashboard not found! Make sure apps/dashboard.py exists.[/red]")
+        return
+    
+    try:
+        subprocess.run([sys.executable, str(dashboard_path)])
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Dashboard stopped[/yellow]")
+
+
 if __name__ == "__main__":
     app()

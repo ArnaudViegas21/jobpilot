@@ -20,25 +20,35 @@ wheels/
 .installed.cfg
 *.egg
 
+# Python tooling / test caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
 # Virtual environments
 venv/
 ENV/
 env/
-
-# Personal data - NEVER COMMIT THESE
-config.yaml
-data/applications.csv
-data/resume.json
-data/resume.pdf
-data/*.pdf
-data/*.docx
-
-# Keep jobs.json for reference but you can gitignore if sensitive
-# data/jobs.json
+.venv/
 
 # Environment variables
 .env
 .env.local
+.env.*
+
+# Personal/local config
+config.yaml
+config.local.yaml
+secrets.yaml
+
+# Data files - ignore all, allow only safe samples
+data/*
+!data/sample_applications.csv
+!data/sample_jobs.json
+!data/resume.example.json
 
 # IDE
 .vscode/
@@ -51,21 +61,21 @@ data/*.docx
 .DS_Store
 Thumbs.db
 
-# Playwright
+# Playwright / test artifacts
 playwright-report/
 test-results/
 screenshots/
-*.png
-*.jpg
 
 # Logs
 *.log
 logs/
 
-# Database
+# Databases
 *.db
 *.sqlite
+*.db-journal
 
-# Config with secrets
-config.local.yaml
-secrets.yaml
+# Frontend / Node
+node_modules/
+.next/
+out/
