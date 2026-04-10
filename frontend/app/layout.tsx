@@ -1,16 +1,16 @@
-import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata = {
-  title: "JobPilot Dashboard",
-  description: "Track and manage your job applications",
+export const metadata: Metadata = {
+  title: "JobPilot",
+  description: "Job application tracker",
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en">
       <body>{children}</body>

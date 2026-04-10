@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { getApplications, updateApplication } from "@/lib/api";
-import { Application } from "@/types/application";
+import { useEffect, useState } from "react";
+import { getApplications, createApplication, updateApplication } from "@/lib/api";
+import type { Application } from "@/types/application";
 import SummaryCards from "@/components/SummaryCards";
 import ApplicationCard from "@/components/ApplicationCard";
 import AddApplicationForm from "@/components/AddApplicationForm";
 
 export default function HomePage() {
-  const [apps, setApps] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -16,7 +16,7 @@ export default function HomePage() {
     try {
       setError("");
       const data = await getApplications();
-      setApps(data);
+      setApplications(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load applications");
     } finally {
@@ -28,69 +28,74 @@ export default function HomePage() {
     loadApplications();
   }, []);
 
-  async function handleQuickStatusChange(id: number, nextStatus: string) {
+  async function handleCreate(payload: {
+    job_id: string;
+    company: string;
+    title: string;
+    location?: string;
+    source?: string;
+    status?: string;
+    notes?: string;
+  }) {
     try {
-      const updated = await updateApplication(id, { status: nextStatus });
+      const created = await createApplication(payload);
+      setApplications((prev) => [created, ...prev]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create application");
+    }
+  }
 
-      setApps((prev) =>
+  async function handleStatusChange(id: number, status: string) {
+    try {
+      const updated = await updateApplication(id, { status });
+      setApplications((prev) =>
         prev.map((app) => (app.id === id ? updated : app))
       );
     } catch (err) {
-      console.error(err);
       setError(err instanceof Error ? err.message : "Failed to update application");
     }
   }
 
-  function handleCreated(newApp: Application) {
-    setApps((prev) => [newApp, ...prev]);
-  }
-
-  const sortedApps = useMemo(() => {
-    return [...apps].sort(
-      (a, b) =>
-        new Date(b.date_updated).getTime() - new Date(a.date_updated).getTime()
-    );
-  }, [apps]);
-
   return (
-    <main className="min-h-screen bg-gray-50 p-6 md:p-10">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900">JobPilot Dashboard</h1>
-          <p className="mt-2 text-gray-600">
-            Track applications, update statuses, and manage your job search in one place.
+    <main className="min-h-screen bg-slate-50 px-4 py-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">JobPilot Dashboard</h1>
+          <p className="mt-2 text-slate-600">
+            Track applications, update statuses, and manage your search.
           </p>
-        </header>
-
-        <SummaryCards apps={apps} />
-
-        <AddApplicationForm onCreated={handleCreated} />
+        </div>
 
         {error && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
             {error}
           </div>
         )}
 
-        {loading ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            Loading applications...
-          </div>
-        ) : sortedApps.length === 0 ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            No applications found.
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {sortedApps.map((app) => (
-              <ApplicationCard
-                key={app.id}
-                app={app}
-                onQuickStatusChange={handleQuickStatusChange}
-              />
-            ))}
-          </div>
-        )}
+        <SummaryCards applications={applications} />
+        <AddApplicationForm onSubmit={handleCreate} />
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-slate-900">Applications</h2>
+
+          {loading ? (
+            <div className="rounded-xl bg-white p-6 shadow-sm">Loading...</div>
+          ) : applications.length === 0 ? (
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              No applications yet.
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {applications.map((application) => (
+                <ApplicationCard
+                  key={application.id}
+                  application={application}
+                  onStatusChange={handleStatusChange}
+                />
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );

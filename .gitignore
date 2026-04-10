@@ -1,4 +1,29 @@
-# Python
+# =========================
+# 🔐 ENV / SECRETS (CRITICAL)
+# =========================
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API keys / secrets
+secrets.*
+*.pem
+*.key
+*.crt
+*.p12
+
+# Python config files that may contain credentials
+config.yaml
+config.yml
+config.local.yaml
+secrets.yaml
+
+# =========================
+# 🐍 PYTHON
+# =========================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,7 +45,7 @@ wheels/
 .installed.cfg
 *.egg
 
-# Python tooling / test caches
+# Python tooling / caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -34,48 +59,72 @@ ENV/
 env/
 .venv/
 
-# Environment variables
-.env
-.env.local
-.env.*
+# =========================
+# 🗄 DATABASES
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
 
-# Personal/local config
-config.yaml
-config.local.yaml
-secrets.yaml
-
-# Data files - ignore all, allow only safe samples
+# =========================
+# 📊 DATA FILES (SAFE FILTER)
+# =========================
 data/*
 !data/sample_applications.csv
 !data/sample_jobs.json
 !data/resume.example.json
 
-# IDE
+# =========================
+# 🌐 NODE / FRONTEND
+# =========================
+node_modules/
+.next/
+out/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# ⚙️ NEXT.JS / TYPESCRIPT
+# =========================
+.next/cache
+*.tsbuildinfo
+
+# =========================
+# 🧪 TEST / AUTOMATION
+# =========================
+playwright-report/
+test-results/
+screenshots/
+coverage/
+
+# =========================
+# 🖥 IDE / EDITOR
+# =========================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# =========================
+# 💻 OS FILES
+# =========================
 .DS_Store
 Thumbs.db
 
-# Playwright / test artifacts
-playwright-report/
-test-results/
-screenshots/
+# =========================
+# 🚨 EXTRA SAFETY (OPTIONAL)
+# =========================
+# Prevent accidental uploads of resumes / personal docs
+*.pdf
+*.docx
+*.doc
 
-# Logs
-*.log
-logs/
-
-# Databases
-*.db
-*.sqlite
-*.db-journal
-
-# Frontend / Node
-node_modules/
-.next/
-out/
+# Allow example resumes only
+!*.example.pdf

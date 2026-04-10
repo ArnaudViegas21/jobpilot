@@ -1,30 +1,30 @@
-import { Application } from "@/types/application";
+import type { Application } from "@/types/application";
 
-type SummaryCardsProps = {
-  apps: Application[];
+type Props = {
+  applications: Application[];
 };
 
-export default function SummaryCards({ apps }: SummaryCardsProps) {
-  const total = apps.length;
-  const interviews = apps.filter((a) => a.status.toLowerCase() === "interview").length;
-  const offers = apps.filter((a) => a.status.toLowerCase() === "offer").length;
-  const rejected = apps.filter((a) => a.status.toLowerCase() === "rejected").length;
+export default function SummaryCards({ applications }: Props) {
+  const total = applications.length;
+  const applied = applications.filter((a) => a.status === "applied").length;
+  const interview = applications.filter((a) => a.status === "interview").length;
+  const offer = applications.filter((a) => a.status === "offer").length;
+
+  const cards = [
+    { label: "Total", value: total },
+    { label: "Applied", value: applied },
+    { label: "Interviews", value: interview },
+    { label: "Offers", value: offer },
+  ];
 
   return (
-    <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-      <Card title="Total" value={total} />
-      <Card title="Interviews" value={interviews} />
-      <Card title="Offers" value={offers} />
-      <Card title="Rejected" value={rejected} />
-    </div>
-  );
-}
-
-function Card({ title, value }: { title: string; value: number }) {
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="mt-2 text-3xl font-bold text-gray-900">{value}</p>
-    </div>
+    <section className="grid gap-4 md:grid-cols-4">
+      {cards.map((card) => (
+        <div key={card.label} className="rounded-xl bg-white p-5 shadow-sm">
+          <p className="text-sm text-slate-500">{card.label}</p>
+          <p className="mt-2 text-2xl font-bold text-slate-900">{card.value}</p>
+        </div>
+      ))}
+    </section>
   );
 }
